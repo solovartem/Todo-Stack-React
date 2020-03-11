@@ -3,6 +3,7 @@ import IconButton from "../template/iconButton";
 export default props => {
   const renderRows = () => {
     const list = props.list || [];
+
     return list.map(data => (
       <tr key={data.id}>
         <td>{data.description}</td>

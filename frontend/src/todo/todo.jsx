@@ -18,30 +18,46 @@ export default class Todo extends Component {
     this.refresh();
   }
 
-  async handleAdd() {
+  handleAdd() {
     const inputDesc = document.getElementById("description").value;
     if (!inputDesc) return false;
     const description = this.state.description;
-    const putTodo = await Axios.put(`${URL}putTodo/${this.state.id}`, {
-      description
-    }).then(
-      resp => this.refresh()
 
-      // !resp.data.error ? this.refresh() : console.log(resp.data.msg)
-    );
+    return typeof this.state.id === "number"
+      ? this.putTodo(description)
+      : this.add(description);
+  }
 
-    if (typeof this.state.id === "number") {
-      return putTodo;
-    }
-    return await Axios.post(URL.concat("add"), {
+  async add(description) {
+    return await Axios.post(URL.concat("todo"), {
       description
-    }).then(resp =>
-      !resp.data.error ? this.refresh() : console.log(resp.data.msg)
-    );
+    }).then(resp => {
+      if (resp.data.erro) {
+        console.log(resp.data.erro.msg);
+        return false;
+      }
+
+      return this.refresh();
+    });
+  }
+
+  async putTodo(description) {
+    const reqEdit = await Axios.put(`${URL}todo/${this.state.id}`, {
+      description
+    }).then(resp => {
+      if (resp.data.erro) {
+        console.log(resp.data.msg);
+        return false;
+      }
+
+      this.state.id = null;
+      return this.refresh();
+    });
+    return reqEdit;
   }
 
   async refresh(todo = {}) {
-    Axios.get(URL.concat("list")).then(listen =>
+    return await Axios.get(URL.concat("todo")).then(listen =>
       todo.mark
         ? this.setState({
             description: todo.description,
@@ -57,7 +73,7 @@ export default class Todo extends Component {
   }
 
   async handleRemove(todo) {
-    await Axios.delete(`${URL}delete/${todo.id}`).then(resp => this.refresh());
+    await Axios.delete(`${URL}todo/${todo.id}`).then(resp => this.refresh());
   }
 
   async handleToggleMark(todo) {

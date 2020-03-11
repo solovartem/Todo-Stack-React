@@ -1,10 +1,10 @@
-const server = require('./config/server');
+require('./config/server');
 require('./config/database');
+
 const dbConfig = require('../src/config/database');
 const Sequelize = require('sequelize');
 const connection = new Sequelize(dbConfig);
 const Todo = require('./api/todo/Todo');
-
 
 Todo.init(connection);
 
